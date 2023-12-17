@@ -66,6 +66,17 @@ def readScheduleFile(fileName):
 
 
 
+def saveheader(filename):
+    """Requires: Filename need to be a .txt file
+        Ensures: Returns the header from the filename"""
+    header = []
+    f = open(filename, "r")
+    for line in f.readlines():
+            header.append(line)
+    for i in header[7:]:
+        header.remove(i)
+    return header
+
 
 def removeHeader(filename):
     l=[]

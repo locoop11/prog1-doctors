@@ -5,27 +5,61 @@
 # 75000 Alberto Albertino 
 # 75001 Maria Marisa
 
+from dateTime import updatedheaderhour, updatedtitlehour
+from infoFromFiles import saveheader
 
 
-def writeScheduleFile(sched, header, fileName):
-    """
-    Writes a collection of scheduled birth assistances into a file.
+def writeScheduleFile(schedule, fileName):
+    header = saveheader(fileName)
+    header[3]= updatedheaderhour(header[3])
+    timefilename= fileName[8:-4]
+    timefilename= updatedtitlehour(timefilename)
+    newFileName = fileName[:7]
+    newFileName += timefilename + '.txt'
+    newfile = open(newFileName, 'w')
+    header = str(header)
+    header = header.replace('[','')
+    header = header.replace(']','')
+    header = header.replace("'","")
+    header = header.replace(",","")
+    header = header.replace(r'\n','\n')
+    header = header.replace(' ','')
+    newfile.write(header)
+    for item in schedule:
+        item = str(item)
+        item = item.replace('[','')
+        item = item.replace(']','')
+        item = item.replace("'","") 
+        newfile.write(item + '\n')   
+    newfile.close
+    return newfile
 
-    Requires:
-    sched is a list with the structure as in the output of
-    planning.updateSchedule representing the cruises assigned;
-    header is a string with a header, as in the examples provided in 
-    the general specification (omitted here for the sake of readability);
-    fileName is a str with the name of a .txt file.
-    Ensures:
-    writing of file named fileName representing the birth assistances in schedule,
-    one per line, as organized in the examples provided
-    in the general specification (omitted here for the sake of readability); 
-    the lines in this file keeps the ordering top to bottom of 
-    the assistances as ordered head to tail in sched.
-    """
+def writeDoctorsFile(doctors, fileName):
+    
+    header = saveheader(fileName)
+    header[3]= updatedheaderhour(header[3])
+    timefilename= fileName[7:-4]
+    timefilename= updatedtitlehour(timefilename)
+    newFileName = fileName[:7]
+    newFileName += timefilename + '.txt'
+    newfile = open(newFileName, 'w')
+    header = str(header)
+    header = header.replace('[','')
+    header = header.replace(']','')
+    header = header.replace("'","")
+    header = header.replace(",","")
+    header = header.replace(r'\n','\n')
+    header = header.replace(' ','')
+    newfile.write(header)
+    for item in doctors:
+        item = str(item)
+        item = item.replace('[','')
+        item = item.replace(']','')
+        item = item.replace("'","") 
+        newfile.write(item + '\n')   
+    newfile.close
+    return newfile
 
 
-
-def writeDoctorsFile(doctors, header, fileName):
-    return
+doctors = ['Abílio Amaral' + '1' +  '10h30'+  '80'+ '7h20', 'Abílio Amaral' + '1' +  '10h30'+  '80'+ '7h20', 'Abílio Amaral' + '1' +  '10h30'+  '80'+ '7h20']
+print(writeDoctorsFile(doctors, 'doctors10h00.txt'))

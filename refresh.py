@@ -5,9 +5,10 @@
 # 75000 Alberto Albertino 
 # 75001 Maria Marisa
 import constants as const
-from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile, updateSchedule
-from dateTime import *
+from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile, saveheader
+from planning import updateSchedule
 from infoToFiles import writeScheduleFile, writeDoctorsFile
+
 
 
 def plan(doctorsFileName, scheduleFileName, requestsFileName):
@@ -33,11 +34,18 @@ def plan(doctorsFileName, scheduleFileName, requestsFileName):
     of the latter.
     """
     doctors = readDoctorsFile(doctorsFileName)
-    schedule = readScheduleFile(scheduleFileName)
+    schedule = readScheduleFile(scheduleFileName)       #le os ficheiros
     requests = readRequestsFile(requestsFileName)
-    newSchedule = updateSchedule(doctors, requests, schedule)
-    writeScheduleFile(newSchedule, requestsFileName)
-    writeDoctorsFile(doctors, requestsFileName)
+
+    doctorsHeader = saveheader(doctorsFileName)        #guarda os headers para usar nas funcoes de escrita
+    scheduleHeader = saveheader(scheduleFileName)      
+
+    newSchedule = updateSchedule(doctors, requests, schedule)               #faz o update do schedule
+
+
+    writeDoctorsFile(doctors, doctorsHeader)                        #escreve os ficheiros
+    writeScheduleFile(newSchedule, scheduleHeader)          
+   
     
 
 

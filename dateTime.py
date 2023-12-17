@@ -24,8 +24,8 @@ def minutesToInt(time):
     """
 
     """
-    t = int(time)
-    return t
+    t = time.split("h")
+    return int(t[1])
     
 
 
@@ -136,12 +136,9 @@ def biggestDate(dateTime1, dateTime2):
         else:
             return dateTime2
 
-def updatehours(time):
-    hour = time[:2]
-    minutes = time[3:]
-    
-    min = minutesToInt(minutes)
-    h=hourToInt(hour)
+def updatehours(time):    
+    min = minutesToInt(time)
+    h=hourToInt(time)
     min=min +30
     if min>=60:
         h=h+1
@@ -151,13 +148,32 @@ def updatehours(time):
 
 
 
-def hourValue(fileName):
 
-    f = open(fileName, "r")
-    f.readline()
+def updatedheaderhour(time):
+    hour= hourToInt(time)
+    minutes= minutesToInt(time)
+    if hour  < 8 or hour >= 20:
+            hour = 8
+            minutes = 0
+    elif minutes == 00:
+        minutes = 30
+    elif minutes == 30:
+        minutes = 0
+        hour += 1
+    finaltime = intToTime(hour, minutes)
+    finaltime += '\n'
+    return finaltime
 
-
-
-
-
-
+def updatedtitlehour(time):
+    hour= hourToInt(time)
+    minutes= minutesToInt(time)
+    if hour  < 8 or hour >= 20:
+            hour = 8
+            minutes = 0
+    elif minutes == 00:
+        minutes = 30
+    elif minutes == 30:
+        minutes = 0
+        hour += 1
+    finaltime = intToTime(hour, minutes)
+    return finaltime
