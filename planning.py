@@ -37,10 +37,10 @@ def updateSchedule(doctors, requests, previousSched, scheduleTime, scheduleDay):
 
 
 	# 1. Sort request by priority and doctors by skill
-	newSchedule = createNewScheduleBasedOnPrevious(previousSched)
+	newSchedule = createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay)
 	sortRequests(requests)
 	sortDoctors(doctors)
-	motherWithoutDoctor = []
+
 	for request in requests:
 		doctor  = getMatchingDoctor(request, doctors) # get the doctor that is the best to do the request
 		
@@ -68,8 +68,8 @@ def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleD
 
 	# Update doctor characteristics
 	doctor[const.DOCT_ACCUM_HOURS_DAY_IDX] = str(int(doctor[const.DOCT_ACCUM_HOURS_DAY_IDX]) + 30)
-	doctor[const.DOCT_ACCUM_TIME_WEEK_IDX] = updatehours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])
-	doctor[const.DOCT_LAST_END_SCHED_TIME_IDX] = updatehours(doctor[const.DOCT_LAST_END_SCHED_TIME_IDX])
+	doctor[const.DOCT_ACCUM_TIME_WEEK_IDX] = updateHours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])
+	doctor[const.DOCT_LAST_END_SCHED_TIME_IDX] = updateHours(doctor[const.DOCT_LAST_END_SCHED_TIME_IDX])
 
 
 
@@ -116,16 +116,29 @@ def custom_sort_key(arr):
 
 def isDoctorAvailable(doctor):
 	if doctor[const.DOCT_ACCUM_HOURS_DAY_IDX] != "weekly leave" :
-		if updatehours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])[0] == "4":
+		if updateHours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])[0] == "4":
 			return False
 	return True
 
-def createNewScheduleBasedOnPrevious(previousSched):
+"""
+This function returns the biggest date between two datesCreate a new schedule having the old one as a base
+But if a schedule already happened is removed from new schedule
+"""
+def createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay):
+	newScheduleTime = updateHours(scheduleTime)
+	if( newScheduleTime[0] == "20"):
+		newScheduleTime = "04h00"
+		newScheduleDay = updateDay(scheduleDay)
+	else:
+		newScheduleDay = scheduleDay
+		
+	newScheduleDate = newScheduleDay +"|"+newScheduleTime.replace("h", ":")
 	newSchedule = []
-	# for i in range(1, len(previousSched)):
-	# 	newSchedule.append(previousSched[0])
+	for oldSchedule in previousSched:
+		oldScheduleDate = scheduleDay +"|"+oldSchedule[0].replace("h", ":")
+		if( biggestDate(oldScheduleDate, newScheduleDate) == oldScheduleDate):
+			newSchedule.append(oldSchedule)
 
-	# # TODO: This function needs to remove the schedules that are already done (schedule time is less than current time)
 	return newSchedule
 
 def isDoctorSkillHigherOrEqual(doctor, request):
@@ -172,14 +185,15 @@ def sortDoctors(doctors):
 	# Sort doctors by priority then by name
 	doctors.sort(key=lambda x: (-int(x[1])))
 
-doctors = readDoctorsFile('doctors10h00.txt')
-requests = readRequestsFile('requests10h30.txt')
-(schedule, scheduleTime, scheduleDay) = readScheduleFile('schedule10h00.txt')
-newSchedule = updateSchedule(doctors, requests, schedule, scheduleTime, scheduleDay)
+# doctors = readDoctorsFile('doctors10h00.txt')
+# requests = readRequestsFile('requests10h30.txt')
+# (schedule, scheduleTime, scheduleDay) = readScheduleFile('schedule10h00.txt')
+# newSchedule = updateSchedule(doctors, requests, schedule, scheduleTime, scheduleDay)
 
-print(requests)
-print("============")
-print(doctors)
+
+# print(requests)
+# print("============")
+# print(doctors)
 
 
 

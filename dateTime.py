@@ -136,7 +136,7 @@ def biggestDate(dateTime1, dateTime2):
         else:
             return dateTime2
 
-def updatehours(time):    
+def updateHours(time):    
     min = minutesToInt(time)
     h=hourToInt(time)
     min=min +30
@@ -146,34 +146,29 @@ def updatehours(time):
     finalTime=intToTime(h, min)
     return finalTime
 
-
-
-
-def updatedheaderhour(time):
-    hour= hourToInt(time)
-    minutes= minutesToInt(time)
-    if hour  < 8 or hour >= 20:
-            hour = 8
-            minutes = 0
-    elif minutes == 00:
-        minutes = 30
-    elif minutes == 30:
-        minutes = 0
-        hour += 1
-    finaltime = intToTime(hour, minutes)
-    finaltime += '\n'
-    return finaltime
-
-def updatedtitlehour(time):
-    hour= hourToInt(time)
-    minutes= minutesToInt(time)
-    if hour  < 8 or hour >= 20:
-            hour = 8
-            minutes = 0
-    elif minutes == 00:
-        minutes = 30
-    elif minutes == 30:
-        minutes = 0
-        hour += 1
-    finaltime = intToTime(hour, minutes)
-    return finaltime
+def updateDay(day):
+    """ This function adds one day to the given input date in the format dd:mm:yyyy.
+        If the new day is bigger than 31, the month is updated. Also if the new month is bigger than 12, the year is updated.
+        Also if the new day is in february and it's bigger than 28, the month is updated to march. Also if in february and it's a leap year, the day is updated to 29.
+    """
+    day = day.split(":")
+    day = int(day[0])
+    month = int(day[1])
+    year = int(day[2])
+    day = day + 1
+    if day > 31:
+        day = 1
+        month = month + 1
+    if month > 12:
+        month = 1
+        year = year + 1
+    if day > 28 and month == 2:
+        day = 1
+        month = 3
+    if day > 29 and month == 2 and year % 4 == 0:
+        day = 29
+    day = str(day)
+    month = str(month)
+    year = str(year)
+    day = day + ":" + month + ":" + year
+    return day

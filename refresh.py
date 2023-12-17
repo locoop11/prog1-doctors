@@ -5,9 +5,10 @@
 # 75000 Alberto Albertino 
 # 75001 Maria Marisa
 import constants as const
-from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile, saveheader
+from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile
 from planning import updateSchedule
 from infoToFiles import writeScheduleFile, writeDoctorsFile
+from dateTime import *
 
 
 
@@ -34,22 +35,31 @@ def plan(doctorsFileName, scheduleFileName, requestsFileName):
     of the latter.
     """
     doctors = readDoctorsFile(doctorsFileName)
-    schedule = readScheduleFile(scheduleFileName)       #le os ficheiros
+    (schedule, scheduleTime, scheduleDay) = readScheduleFile(scheduleFileName)      #le os ficheiros
     requests = readRequestsFile(requestsFileName)
 
-    doctorsHeader = saveheader(doctorsFileName)        #guarda os headers para usar nas funcoes de escrita
-    scheduleHeader = saveheader(scheduleFileName)      
 
-    newSchedule = updateSchedule(doctors, requests, schedule)               #faz o update do schedule
+    newSchedule = updateSchedule(doctors, requests, schedule, scheduleTime, scheduleDay)               #faz o update do schedule
+
+    (scheduleFileName, doctorsFileName) = computeNewFileNames (scheduleTime, scheduleDay)
 
 
-    writeDoctorsFile(doctors, doctorsHeader)                        #escreve os ficheiros
-    writeScheduleFile(newSchedule, scheduleHeader)          
+    writeDoctorsFile(doctors, doctorsFileName, scheduleDay, scheduleTime)
+    writeScheduleFile(newSchedule, scheduleFileName, scheduleDay, scheduleTime)          
    
+def computeNewFileNames (scheduleTime, scheduleDay):
+    newScheduleTime = updateHours(scheduleTime)
+    newScheduleDay = scheduleDay
+    if( hourToInt(scheduleTime) >= 20):
+        scheduleTime = "04h00"
+        scheduleDay = updateDay(scheduleDay)
     
+    newScheduleFileName = "schedule" + newScheduleTime + ".txt"
+    newDoctorsFileName = "doctors" + newScheduleTime + ".txt"
 
+    return (newScheduleFileName, newDoctorsFileName)
 
-
+plan("doctors19h30.txt", "schedule19h30.txt", "requests20h00.txt")
 
         
 
