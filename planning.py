@@ -1,9 +1,8 @@
-#-*- coding: utf-8 -*-
-
 # 2023-2024 Programação 1 (LTI)
-# Grupo 546
-# 75000 Alberto Albertino 
-# 75001 Maria Marisa
+# Grupo 30
+# 60267 Antonio Neco
+# 60253 Hugo Silva
+
 
 from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile
 import constants as const
@@ -55,12 +54,23 @@ def updateSchedule(doctors, requests, previousSched, scheduleTime, scheduleDay):
 	return newSchedule
 
 def sendRequestToOtherHospital(request, newSchedule, scheduleTime):
-		newSchedule.append((scheduleTime, request[const.REQ_NAME_IDX], "redirected to other network"))
+	"""
+	Writes a request in the newSchedule with the message "redirected to other network" which signals that the request was sent to another hospital either because there are no doctors available 
+	or because there are no doctors with the required skill level or even if the doctor does not have available time to perform the request.
+
+	Requires:
+	request that should be sent to another hospital, the schedule to which append the request to and the time of the schedule
+	"""	
+	newSchedule.append((scheduleTime, request[const.REQ_NAME_IDX], "redirected to other network"))
 
 def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleDay):
 	"""
 	this funcion adds the doctor and the request in the newSchedule, and updates the doctor carcateristics
-	retorna um boleeano
+	Requires:
+	The doctor to add to the schedule. The request to append to the schedule. The newSchedule to append the request to. The time of the schedule. The day of the schedule.
+
+	Ensures:
+	The doctor is added to the schedule and the doctor characteristics are updated.
 	"""
 	scheduleDoctorName = doctor[const.DOCT_NAME_IDX]
 	scheduleRequestName = request[const.REQ_NAME_IDX]
@@ -82,14 +92,17 @@ def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleD
 	doctor[const.DOCT_LAST_END_SCHED_TIME_IDX] = updateHours(doctorScheduleTime)
 
 
-
-
-
-
-
-
 def getMatchingDoctor(request, doctors):
-	
+	"""
+	Calculates the doctors that have the required skill and availability to perform the request given
+
+	Requires:
+	The request to be performed and the list of all doctors
+
+	Ensures:
+	A doctor that has the required skill and availability to perform the request given. The doctors are sorted by priority which means that when more than one doctor is available 
+	to perform the request the doctor with the highest priority is returned. Priority is given by the lowest accumulated hours in the day, the lowest accumulated hours in the week,
+	"""	
 	listOfMatchingDoctors = []
 	for doctor in doctors:
 		# A doctor is NOT availbale to do the request if:
@@ -112,6 +125,9 @@ def prioritezeDoctors(listOfMatchingDoctors):
 
 # Define a custom sorting key function
 def custom_sort_key(arr):
+	"""
+	Function to be used to sort doctors by priority
+	"""
 	type = int(arr[const.DOCT_TYPE_IDX])
 	accumHours = int(arr[const.DOCT_ACCUM_HOURS_DAY_IDX])
 	accumTimeWeek = arr[const.DOCT_ACCUM_TIME_WEEK_IDX]
@@ -125,16 +141,25 @@ def custom_sort_key(arr):
 	return (-type, accumHours, hours, minutes)
 
 def isDoctorAvailable(doctor):
+	"""
+	Checks thast a doctor is available to perform a request, ie is not in weekly leave and has enough hours to perform the request
+	Requires:
+	The doctor to check if is available
+	Ensures to return a boolean value True if the doctor is available and False otherwise
+	"""
 	if doctor[const.DOCT_ACCUM_HOURS_DAY_IDX] != "weekly leave" :
 		if updateHours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])[0] == "4":
 			return False
 	return True
 
-"""
-This function returns the biggest date between two datesCreate a new schedule having the old one as a base
-But if a schedule already happened is removed from new schedule
-"""
 def createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay):
+	"""
+	Creates a new schedule copying to the new schedule all requests that are not yet performed
+	Requires:
+	the previous schedule to copy schedules from, the time of the schedule and the day of the schedule
+	Ensures:
+	To return a new schedule containing all requests that are not yet performed
+	"""
 	newScheduleTime = updateHours(scheduleTime)
 	if( newScheduleTime[:1] == "20"):
 		newScheduleTime = "04h00"
@@ -153,7 +178,11 @@ def createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay):
 
 def isDoctorSkillHigherOrEqual(doctor, request):
 	"""
-	this funcion return a tuple
+	Checks if a doctor skill is enough for a given request
+	Requires: 
+	The doctor to check if has the required skill and the request to be performed.
+	Ensures:
+	To return a boolean value True if the doctor has the required skill and False otherwise
 	"""
 	if request[-1] == 'high':
 		if doctor[const.DOCT_TYPE_IDX] == '2' or doctor[const.DOCT_TYPE_IDX] == '3':
@@ -164,17 +193,21 @@ def isDoctorSkillHigherOrEqual(doctor, request):
 	
 def sortRequests(requests):
 	"""
+	Sorts requests by priority, bracelet color, age and Name of the mother 
 	Requires:
-	requests is a list of lists with the structure as in the output of 
-	infoFromFile.readRequestsFile concerning the current update time;
+	The requests to be sorted
+	
 	Ensures:
-	a list of lists with the same structure as requests, sorted by priority
+	The requests given as input to be, sorted by priority
 	"""
 	# Sort requests by priority then by color (red, them yellow then green), then by age descending then by name
 	requests
 	requests.sort(key=lambda x: (x[3], -color(x[2]), -int(x[1]), x[0]))
 
 def color(color):
+	"""
+	Converts a color to an integerr to be used in sorting
+	"""
 	if color == 'red':
 		return 3
 	elif color == 'yellow':
@@ -186,24 +219,15 @@ def color(color):
 	
 def sortDoctors(doctors):
 	"""
+	Sorts doctors by skill
 	Requires:
-	doctors is a list of lists with the structure as in the output of
-	infoFromFiles.readDoctorsFile concerning the time of previous schedule;
+	The list of doctorts to sort
 	Ensures:
-	a list of lists with the same structure as doctors, sorted by priority
+	The doctors given as input to be, sorted by skill
 	"""
 	# Sort doctors by priority then by name
 	doctors.sort(key=lambda x: (-int(x[1])))
 
-# doctors = readDoctorsFile('doctors10h00.txt')
-# requests = readRequestsFile('requests10h30.txt')
-# (schedule, scheduleTime, scheduleDay) = readScheduleFile('schedule10h00.txt')
-# newSchedule = updateSchedule(doctors, requests, schedule, scheduleTime, scheduleDay)
-
-
-# print(requests)
-# print("============")
-# print(doctors)
 
 
 

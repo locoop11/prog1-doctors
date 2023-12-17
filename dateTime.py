@@ -1,9 +1,8 @@
-#-*- coding: utf-8 -*-
-
 # 2023-2024 Programação 1 (LTI)
-# Grupo 546
-# 75000 Alberto Albertino 
-# 75001 Maria Marisa
+# Grupo 30
+# 60267 Antonio Neco
+# 60253 Hugo Silva
+
 
 
 from datetime import datetime

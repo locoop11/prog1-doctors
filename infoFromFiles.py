@@ -1,9 +1,8 @@
-#-*- coding: utf-8 -*-
-
 # 2023-2024 Programação 1 (LTI)
-# Grupo 546
-# 75000 Alberto Albertino 
-# 75001 Maria Marisa
+# Grupo 30
+# 60267 Antonio Neco
+# 60253 Hugo Silva
+
 
 
 
@@ -65,6 +64,13 @@ def readScheduleFile(fileName):
     return (scheduleList, scheduleTime, scheduleDay)
 
 def removeHeader(filename):
+    """
+    Removes the header from a file.
+    Requires:
+    filename is a string with the name of the file to write to
+    Ensures:
+    To raise an exception if the file does not exist or if the header is not correct
+    """
     l=[]
     i = 0
     f = None

@@ -1,9 +1,9 @@
-#-*- coding: utf-8 -*-
-
 # 2023-2024 Programação 1 (LTI)
-# Grupo 546
-# 75000 Alberto Albertino 
-# 75001 Maria Marisa
+# Grupo 30
+# 60267 Antonio Neco
+# 60253 Hugo Silva
+
+
 import constants as const
 from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile
 from planning import updateSchedule
@@ -49,6 +49,12 @@ def plan(doctorsFileName, scheduleFileName, requestsFileName):
     writeScheduleFile(newSchedule, scheduleFileName, scheduleDay, scheduleTime)          
    
 def computeNewFileNames (scheduleTime, scheduleDay):
+    """
+    Computes the new file names for the schedule and doctors files. File names hour is increased by 30 minutes.
+    Requires:
+    scheduleTime is a string in the format HHhMM with the time of the current schedule
+    scheduleDay is a string in the format DD-MM-YYYY with the day of the current schedule
+    """
     (newScheduleTime, newScheduleDay) = computeNewTimes(scheduleTime, scheduleDay)
     
     newScheduleFileName = "schedule" + newScheduleTime + ".txt"
@@ -59,6 +65,12 @@ def computeNewFileNames (scheduleTime, scheduleDay):
         
 
 def main():
+    """
+    Main program.
+    Requires:
+    Three command-line arguments, corresponding to the names of the files
+    with the list of doctors, the list of birth assistances and the list of requests, respectively.
+    """
     # Check if the correct number of command-line arguments are provided
     if len(sys.argv) != 4:
         print("Error: invalid number of arguments.")
