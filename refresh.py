@@ -48,18 +48,14 @@ def plan(doctorsFileName, scheduleFileName, requestsFileName):
     writeScheduleFile(newSchedule, scheduleFileName, scheduleDay, scheduleTime)          
    
 def computeNewFileNames (scheduleTime, scheduleDay):
-    newScheduleTime = updateHours(scheduleTime)
-    newScheduleDay = scheduleDay
-    if( hourToInt(scheduleTime) >= 20):
-        scheduleTime = "04h00"
-        scheduleDay = updateDay(scheduleDay)
+    (newScheduleTime, newScheduleDay) = computeNewTimes(scheduleTime, scheduleDay)
     
     newScheduleFileName = "schedule" + newScheduleTime + ".txt"
     newDoctorsFileName = "doctors" + newScheduleTime + ".txt"
 
     return (newScheduleFileName, newDoctorsFileName)
 
-plan("doctors19h30.txt", "schedule19h30.txt", "requests20h00.txt")
+plan("doctors19h00.txt", "schedule19h00.txt", "requests19h30.txt")
 
         
 

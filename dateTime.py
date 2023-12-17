@@ -151,24 +151,36 @@ def updateDay(day):
         If the new day is bigger than 31, the month is updated. Also if the new month is bigger than 12, the year is updated.
         Also if the new day is in february and it's bigger than 28, the month is updated to march. Also if in february and it's a leap year, the day is updated to 29.
     """
-    day = day.split(":")
-    day = int(day[0])
-    month = int(day[1])
-    year = int(day[2])
-    day = day + 1
-    if day > 31:
+    splittedDay = day.split(":")
+    _day = splittedDay[0]
+    _month = splittedDay[1]
+    _year = splittedDay[2]
+    intDay = int(_day)
+    intMonth = int(_month)
+    intYear = int(_year)
+    intDay = intDay + 1
+    if intDay > 31:
+        intDay = 1
+        intMonth = intMonth + 1
+    if intMonth > 12:
+        intMonth = 1
+        intYear = intYear + 1
+    if intDay > 28 and intMonth == 2:
         day = 1
-        month = month + 1
-    if month > 12:
-        month = 1
-        year = year + 1
-    if day > 28 and month == 2:
-        day = 1
-        month = 3
-    if day > 29 and month == 2 and year % 4 == 0:
-        day = 29
-    day = str(day)
-    month = str(month)
-    year = str(year)
-    day = day + ":" + month + ":" + year
-    return day
+        intMonth = 3
+    if intDay > 29 and intMonth == 2 and intYear % 4 == 0:
+        intDay = 29
+    strDay = str(intDay)
+    strMonth = str(intMonth)
+    strYear = str(intYear)
+    retDay = strDay + ":" + strMonth + ":" + strYear
+    return retDay
+
+def computeNewTimes(scheduleTime, scheduleDay):
+    newScheduleTime = updateHours(scheduleTime)
+    if( newScheduleTime[:2] == "20"):
+        newScheduleTime = "04h00"
+        newScheduleDay = updateDay(scheduleDay)
+    else:
+        newScheduleDay = scheduleDay
+    return (newScheduleTime, newScheduleDay)

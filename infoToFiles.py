@@ -26,13 +26,8 @@ def writeScheduleFile(schedule, fileName, scheduleDay, scheduleTime):
     return True
 
 def saveheader(filename, scheduleDay, scheduleTime):
-    newScheduleTime = updateHours(scheduleTime)
-    if( newScheduleTime[0] == "20"):
-        newScheduleTime = "04h00"
-        newScheduleDay = updateDay(scheduleDay)
-    else:
-        newScheduleDay = scheduleDay
-
+    (newScheduleTime, newScheduleDay) = computeNewTimes(scheduleTime, scheduleDay)
+    
     header = []
     header.append("Organization:\n")
     header.append("SmartH\n")

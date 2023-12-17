@@ -38,6 +38,8 @@ def updateSchedule(doctors, requests, previousSched, scheduleTime, scheduleDay):
 
 	# 1. Sort request by priority and doctors by skill
 	newSchedule = createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay)
+	(newScheduleTime, newScheduleDay) = computeNewTimes(scheduleTime, scheduleDay)
+
 	sortRequests(requests)
 	sortDoctors(doctors)
 
@@ -45,12 +47,15 @@ def updateSchedule(doctors, requests, previousSched, scheduleTime, scheduleDay):
 		doctor  = getMatchingDoctor(request, doctors) # get the doctor that is the best to do the request
 		
 		if( doctor != None):
-			addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleDay) # Updates doctor and the new schedule 
+			addDoctorToNewSchedule(doctor, request, newSchedule, newScheduleTime, newScheduleDay) # Updates doctor and the new schedule 
 		else:
 			# If a suitable doctor is not found, send request to another hospital
-			newSchedule.append(scheduleTime, request[const.REQ_NAME_IDX], "redirected to other network")
+			sendRequestToOtherHospital(request, newSchedule, scheduleTime)
 
 	return newSchedule
+
+def sendRequestToOtherHospital(request, newSchedule, scheduleTime):
+		newSchedule.append((scheduleTime, request[const.REQ_NAME_IDX], "redirected to other network"))
 
 def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleDay):
 	"""
@@ -59,17 +64,19 @@ def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleD
 	"""
 	scheduleDoctorName = doctor[const.DOCT_NAME_IDX]
 	scheduleRequestName = request[const.REQ_NAME_IDX]
-	scheduleTime = biggestDate(scheduleDay +"|"+scheduleTime.replace("h", ":"), scheduleDay +"|"+doctor[const.DOCT_LAST_END_SCHED_TIME_IDX].replace("h", ":"))
-	scheduleTime = scheduleTime.split("|")[1].replace(":", "h")
-	
+	doctorScheduleTime = biggestDate(scheduleDay +"|"+scheduleTime.replace("h", ":"), scheduleDay +"|"+doctor[const.DOCT_LAST_END_SCHED_TIME_IDX].replace("h", ":"))
+	doctorScheduleTime = doctorScheduleTime.split("|")[1].replace(":", "h")
+	if( doctorScheduleTime[:2] == "20"):
+		return sendRequestToOtherHospital(request, newSchedule, scheduleTime)
+
 	# Update newSchedule
 	#newSchedule have tree elements the fisrts is the time of the new programmed intervemtion 
-	newSchedule.append( (scheduleTime, scheduleRequestName, scheduleDoctorName) )
+	newSchedule.append( (doctorScheduleTime, scheduleRequestName, scheduleDoctorName) )
 
 	# Update doctor characteristics
 	doctor[const.DOCT_ACCUM_HOURS_DAY_IDX] = str(int(doctor[const.DOCT_ACCUM_HOURS_DAY_IDX]) + 30)
 	doctor[const.DOCT_ACCUM_TIME_WEEK_IDX] = updateHours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])
-	doctor[const.DOCT_LAST_END_SCHED_TIME_IDX] = updateHours(doctor[const.DOCT_LAST_END_SCHED_TIME_IDX])
+	doctor[const.DOCT_LAST_END_SCHED_TIME_IDX] = updateHours(doctorScheduleTime)
 
 
 
@@ -126,12 +133,12 @@ But if a schedule already happened is removed from new schedule
 """
 def createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay):
 	newScheduleTime = updateHours(scheduleTime)
-	if( newScheduleTime[0] == "20"):
+	if( newScheduleTime[:1] == "20"):
 		newScheduleTime = "04h00"
 		newScheduleDay = updateDay(scheduleDay)
 	else:
 		newScheduleDay = scheduleDay
-		
+
 	newScheduleDate = newScheduleDay +"|"+newScheduleTime.replace("h", ":")
 	newSchedule = []
 	for oldSchedule in previousSched:
