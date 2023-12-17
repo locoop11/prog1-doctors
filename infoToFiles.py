@@ -28,3 +28,4 @@ def writeScheduleFile(sched, header, fileName):
 
 
 def writeDoctorsFile(doctors, header, fileName):
+    return

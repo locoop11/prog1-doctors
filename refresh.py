@@ -4,7 +4,10 @@
 # Grupo 546
 # 75000 Alberto Albertino 
 # 75001 Maria Marisa
-
+import constants as const
+from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile, updateSchedule
+from dateTime import *
+from infoToFiles import writeScheduleFile, writeDoctorsFile
 
 
 def plan(doctorsFileName, scheduleFileName, requestsFileName):
@@ -29,7 +32,15 @@ def plan(doctorsFileName, scheduleFileName, requestsFileName):
     scheduleFileName and requestsFileName, and are written in the same directory
     of the latter.
     """
+    doctors = readDoctorsFile(doctorsFileName)
+    schedule = readScheduleFile(scheduleFileName)
+    requests = readRequestsFile(requestsFileName)
+    newSchedule = updateSchedule(doctors, requests, schedule)
+    writeScheduleFile(newSchedule, requestsFileName)
+    writeDoctorsFile(doctors, requestsFileName)
     
+
+
 
 
         

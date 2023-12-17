@@ -6,6 +6,6 @@ Day:
 10:12:2023
 Doctors:
 Abílio Amaral, 1, 11h05, 180, 28h00
-Bernardo Biscaia, 3, 10h30, 80, 7h20
+Bernardo Biscaia, 3, 10h30, 70, 15h00
 Carlos Castro, 2, 10h35, 220, 32h00
-Duarte Dantas, 3, 10h40, 270, 15h00
+Duarte Dantas, 3, 10h40, 70, 7h20

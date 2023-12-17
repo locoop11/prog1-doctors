@@ -4,11 +4,14 @@
 # Grupo 546
 # 75000 Alberto Albertino 
 # 75001 Maria Marisa
+
+from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile
 import constants as const
 from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile
-from dateTime import updatehours
+from dateTime import *
+import re
 
-def updateSchedule(doctors, requests, previousSched): #  nextTime falta meter isto
+def updateSchedule(doctors, requests, previousSched, scheduleTime, scheduleDay): #  nextTime falta meter isto
 	"""
     Update birth assistance schedule assigning the given birth assistance requested
     to the given doctors, taking into account a previous schedule.
@@ -33,27 +36,109 @@ def updateSchedule(doctors, requests, previousSched): #  nextTime falta meter is
 	# schedule exemple: (14h00, Eduarda Elói, Horácio Horta)
 
 
-	# 1. Ordenar os pedidos por ordem de prioridade
-	
-	# Sort request by priority
+	# 1. Sort request by priority and doctors by skill
+	newSchedule = createNewScheduleBasedOnPrevious(previousSched)
 	sortRequests(requests)
 	sortDoctors(doctors)
-	match(doctors, requests)
-
-
-def match(doctors, requests):
-	newSchedule = []
-	for i in len(doctors):
-		if requests[i][-1] == 'hight':
-			for docotor in doctors:
-				if docotor[const.DOCT_Type_IDX] == '2' or docotor[const.DOCT_Type_IDX] == '3':
-					newSchedule.append(requests[i][0], docotor[i][0])
+	motherWithoutDoctor = []
+	for request in requests:
+		doctor  = getMatchingDoctor(request, doctors) # get the doctor that is the best to do the request
 		
+		if( doctor != None):
+			addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleDay) # Updates doctor and the new schedule 
+		else:
+			# If a suitable doctor is not found, send request to another hospital
+			newSchedule.append(scheduleTime, request[const.REQ_NAME_IDX], "redirected to other network")
 
+	return newSchedule
+
+def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleDay):
+	"""
+	this funcion adds the doctor and the request in the newSchedule, and updates the doctor carcateristics
+	retorna um boleeano
+	"""
+	scheduleDoctorName = doctor[const.DOCT_NAME_IDX]
+	scheduleRequestName = request[const.REQ_NAME_IDX]
+	scheduleTime = biggestDate(scheduleDay +"|"+scheduleTime.replace("h", ":"), scheduleDay +"|"+doctor[const.DOCT_LAST_END_SCHED_TIME_IDX].replace("h", ":"))
+	scheduleTime = scheduleTime.split("|")[1].replace(":", "h")
 	
+	# Update newSchedule
+	#newSchedule have tree elements the fisrts is the time of the new programmed intervemtion 
+	newSchedule.append( (scheduleTime, scheduleRequestName, scheduleDoctorName) )
+
+	# Update doctor characteristics
+	doctor[const.DOCT_ACCUM_HOURS_DAY_IDX] = str(int(doctor[const.DOCT_ACCUM_HOURS_DAY_IDX]) + 30)
+	doctor[const.DOCT_ACCUM_TIME_WEEK_IDX] = updatehours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])
+	doctor[const.DOCT_LAST_END_SCHED_TIME_IDX] = updatehours(doctor[const.DOCT_LAST_END_SCHED_TIME_IDX])
 
 
 
+
+
+
+
+
+def getMatchingDoctor(request, doctors):
+	
+	listOfMatchingDoctors = []
+	for doctor in doctors:
+		# A doctor is NOT availbale to do the request if:
+		#    he is already fully booked for the day
+		#    doctor has not enough hours free to do the request
+		if( isDoctorSkillHigherOrEqual(doctor, request) ):
+			# If the doctor is available to do the request, check if he has the right skill
+			# That is we need to check that the skill of the available doctor is equal or higher than the request
+			if isDoctorAvailable(doctor):
+				listOfMatchingDoctors.append(doctor)
+			#sort the doctors most qualifeid first in the list
+	if len(listOfMatchingDoctors) == 0:
+		return None
+	else:
+		prioritezeDoctors(listOfMatchingDoctors)
+		return listOfMatchingDoctors[0]
+
+def prioritezeDoctors(listOfMatchingDoctors):
+	listOfMatchingDoctors.sort(key=custom_sort_key)
+
+# Define a custom sorting key function
+def custom_sort_key(arr):
+	type = int(arr[const.DOCT_TYPE_IDX])
+	accumHours = int(arr[const.DOCT_ACCUM_HOURS_DAY_IDX])
+	accumTimeWeek = arr[const.DOCT_ACCUM_TIME_WEEK_IDX]
+    
+	match = re.match(r'(\d{2})h(\d{2})', accumTimeWeek)
+	if match:
+		hours, minutes = map(int, match.groups())
+	else:
+		hours, minutes = 0, 0
+    
+	return (-type, accumHours, hours, minutes)
+
+def isDoctorAvailable(doctor):
+	if doctor[const.DOCT_ACCUM_HOURS_DAY_IDX] != "weekly leave" :
+		if updatehours(doctor[const.DOCT_ACCUM_TIME_WEEK_IDX])[0] == "4":
+			return False
+	return True
+
+def createNewScheduleBasedOnPrevious(previousSched):
+	newSchedule = []
+	# for i in range(1, len(previousSched)):
+	# 	newSchedule.append(previousSched[0])
+
+	# # TODO: This function needs to remove the schedules that are already done (schedule time is less than current time)
+	return newSchedule
+
+def isDoctorSkillHigherOrEqual(doctor, request):
+	"""
+	this funcion return a tuple
+	"""
+	if request[-1] == 'high':
+		if doctor[const.DOCT_TYPE_IDX] == '2' or doctor[const.DOCT_TYPE_IDX] == '3':
+			return True
+		else:
+			return False
+	return True	
+	
 def sortRequests(requests):
 	"""
 	Requires:
@@ -75,6 +160,7 @@ def color(color):
 		return 1
 	else:
 		return 10
+	
 def sortDoctors(doctors):
 	"""
 	Requires:
@@ -85,27 +171,15 @@ def sortDoctors(doctors):
 	"""
 	# Sort doctors by priority then by name
 	doctors.sort(key=lambda x: (-int(x[1])))
-	for i in range(len(doctors)):
-		if doctors[i][2] == 'weekly leave':
-			doctors[i][2] = '0'
-		else:
-			doctors[i][2] = '1'
-					
-
 
 doctors = readDoctorsFile('doctors10h00.txt')
-requests = readRequestsFile('requests10h00.txt')
+requests = readRequestsFile('requests10h30.txt')
+(schedule, scheduleTime, scheduleDay) = readScheduleFile('schedule10h00.txt')
+newSchedule = updateSchedule(doctors, requests, schedule, scheduleTime, scheduleDay)
 
 print(requests)
 print("============")
-sortRequests(requests)
-print(requests)
-
-
-
-
-
-
+print(doctors)
 
 
 

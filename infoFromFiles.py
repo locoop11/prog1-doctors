@@ -21,25 +21,14 @@ def readDoctorsFile(fileName):
     following the order provided in the lines of the file.
     """
 
-    inFile = removeHeader(fileName)       
+    (inFile, fileTime, fileDay) = removeHeader(fileName)       
 
     doctorsList = [] 
     for line in inFile:
-        requestData = line.rstrip().split(", ")
+        requestData = str(line).rstrip().split(", ")
         doctorsList.append(requestData)        
 
     return doctorsList
-
-
-def readDoctorsFile(fileName):
-    """
-   this funcion reads a file that contans a line that is called hour and then reutrns the string on the next line that is the hour
-    """
-    
-
-
-
-
 
 
 def readRequestsFile(fileName):
@@ -49,16 +38,14 @@ def readRequestsFile(fileName):
     
     """
 
-    inFile = removeHeader(fileName)       
+    (inFile, fileTime, fileDay) = removeHeader(fileName)       
 
     requestsList = [] 
     for line in inFile:
-        requestData = line.rstrip().split(", ")
+        requestData = str(line).rstrip().split(", ")
         requestsList.append(requestData)        
 
     return requestsList
-
-
 
 
 def readScheduleFile(fileName):
@@ -68,37 +55,40 @@ def readScheduleFile(fileName):
     
     """
 
-    inFile = removeHeader(fileName)       
+    (inFile, scheduleTime, scheduleDay) = removeHeader(fileName)       
 
     scheduleList = [] 
     for line in inFile:
         scheduleData = line.rstrip().split(", ")
         scheduleList.append(scheduleData)        
 
-    return scheduleList
-
-
-
+    return (scheduleList, scheduleTime, scheduleDay)
 
 
 
 
 def removeHeader(filename):
     l=[]
+    i = 0
     try:
         f = open(filename, "r")
     except FileNotFoundError:
-        print("Could not found any file")
+        raise FileNotFoundError("File not found")
     finally:
         for line in f.readlines():
-            l.append(line)
+            l.append(line.strip())
+        scheduleTime = l[3]
+        scheduleDay = l[5]
         for i in l[:7]:
             l.remove(i)
     r=[]
     for line in l:
         r.append(line)
-    return r
+    
+    
+
+    return r, scheduleTime, scheduleDay
 
 
 
-#print(readRequestsFile('schedule10h00.txt'))
+removeHeader('schedule10h00.txt')
