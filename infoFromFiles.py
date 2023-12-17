@@ -67,25 +67,38 @@ def readScheduleFile(fileName):
 def removeHeader(filename):
     l=[]
     i = 0
+    f = None
+    fileTime = filename.split(".")[0][-5:]
+    fileType = ""
+    if( filename.find("schedule") != -1):
+        fileType = "Schedule:"
+    if ( filename.find("doctors") != -1):
+        fileType = "Doctors:"
+    if ( filename.find("requests") != -1):
+        fileType = "Mothers:"
+
+
     try:
         f = open(filename, "r")
-    except FileNotFoundError:
-        raise FileNotFoundError("File not found")
-    finally:
         for line in f.readlines():
             l.append(line.strip())
         scheduleTime = l[3]
         scheduleDay = l[5]
+        fileHeaderType = l[6]
         for i in l[:7]:
             l.remove(i)
+    except Exception as e:
+        raise e
+    finally:
+        if( f != None): 
+            f.close()
+
     r=[]
     for line in l:
         r.append(line)
     
+    if( fileHeaderType != fileType):
+        raise ValueError("File head error: scope inconsistency between name and header in file " + filename + ".")
     
 
     return r, scheduleTime, scheduleDay
-
-
-
-removeHeader('schedule10h00.txt')

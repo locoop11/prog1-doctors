@@ -9,6 +9,7 @@ from infoFromFiles import readRequestsFile, readDoctorsFile, readScheduleFile
 from planning import updateSchedule
 from infoToFiles import writeScheduleFile, writeDoctorsFile
 from dateTime import *
+import sys
 
 
 
@@ -55,7 +56,44 @@ def computeNewFileNames (scheduleTime, scheduleDay):
 
     return (newScheduleFileName, newDoctorsFileName)
 
-plan("doctors19h30.txt", "schedule19h30.txt", "requests20h00.txt")
-
         
 
+def main():
+    # Check if the correct number of command-line arguments are provided
+    if len(sys.argv) != 4:
+        print("Error: invalid number of arguments.")
+        print("Usage: python refresh.py <doctors filename> <schedule filename> <requests filename>")
+        return
+    
+    # Extract the file names from the command-line arguments
+    file1 = sys.argv[1]
+    file2 = sys.argv[2]
+    file3 = sys.argv[3]
+
+    doctorsFileName = ""
+    requestsFilName = ""
+    scheduleFileName = ""
+
+    for file in sys.argv:
+        if file.find("doctors") != -1:
+            doctorsFileName = file
+        if file.find("schedule") != -1:
+            scheduleFileName = file
+        if file.find("requests") != -1:
+            requestsFilName = file
+    if( doctorsFileName == "" or requestsFilName == "" or scheduleFileName == ""):
+        print("Error: invalid file name.")
+        print("Usage: python refresh.py <doctors filename> <schedule filename> <requests filename>")
+        exit(1)
+    try:
+        plan(doctorsFileName, scheduleFileName, requestsFilName)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    # Optionally, you can perform additional error handling here if needed
+    # ...
+    # Exit in a controlled way (e.g., with a specific exit code)
+    exit(1)  # Exit with a non-zero exit code to indicate an error
+
+
+if __name__ == "__main__":
+    main()
