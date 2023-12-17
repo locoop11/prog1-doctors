@@ -55,7 +55,7 @@ def computeNewFileNames (scheduleTime, scheduleDay):
 
     return (newScheduleFileName, newDoctorsFileName)
 
-plan("doctors19h00.txt", "schedule19h00.txt", "requests19h30.txt")
+plan("doctors19h30.txt", "schedule19h30.txt", "requests20h00.txt")
 
         
 

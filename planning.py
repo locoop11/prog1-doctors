@@ -66,8 +66,11 @@ def addDoctorToNewSchedule(doctor, request, newSchedule, scheduleTime, scheduleD
 	scheduleRequestName = request[const.REQ_NAME_IDX]
 	doctorScheduleTime = biggestDate(scheduleDay +"|"+scheduleTime.replace("h", ":"), scheduleDay +"|"+doctor[const.DOCT_LAST_END_SCHED_TIME_IDX].replace("h", ":"))
 	doctorScheduleTime = doctorScheduleTime.split("|")[1].replace(":", "h")
-	if( doctorScheduleTime[:2] == "20"):
-		return sendRequestToOtherHospital(request, newSchedule, scheduleTime)
+	if( doctorScheduleTime[:2] == "20" and scheduleTime[:2] == "04"):
+		doctorScheduleTime = scheduleTime
+	else:
+		if( doctorScheduleTime[:2] == "20"):
+			return sendRequestToOtherHospital(request, newSchedule, scheduleTime)
 
 	# Update newSchedule
 	#newSchedule have tree elements the fisrts is the time of the new programmed intervemtion 
